@@ -76,6 +76,7 @@ public class ConfigurationFactoryTest {
     private File malformedFile;
     private File invalidFile;
     private File validFile;
+    private File innerClassFile;
 
     @After
     public void resetConfigOverrides() {
@@ -92,6 +93,7 @@ public class ConfigurationFactoryTest {
         this.malformedFile = new File(Resources.getResource("factory-test-malformed.yml").toURI());
         this.invalidFile = new File(Resources.getResource("factory-test-invalid.yml").toURI());
         this.validFile = new File(Resources.getResource("factory-test-valid.yml").toURI());
+        this.innerClassFile = new File(Resources.getResource("factory-test-innerclass.yml").toURI());
     }
 
     @Test
@@ -253,6 +255,15 @@ public class ConfigurationFactoryTest {
             assertThat(e.getMessage())
                     .containsOnlyOnce(" * Failed to parse configuration; Can not instantiate");
         }
+    }
+
+    @Test
+    public void handleInnerClasses() throws Exception {
+        final ExampleWithInnerClasses example =
+                new ConfigurationFactory<>(ExampleWithInnerClasses.class, validator, Jackson.newObjectMapper(), "dw")
+                        .build(innerClassFile);
+
+        assertThat(example.inner.bigNumber).isEqualTo(new Long(100000L));
     }
 
     @Test
